@@ -14,12 +14,24 @@ type alias Name =
     String
 
 
+type alias WithoutTip =
+    Float
+
+
+type alias WithTip =
+    Float
+
+
+type Total
+    = Total WithoutTip WithTip
+
+
 type Person
     = Person Name (List Charge)
 
 
 type alias Model =
-    { tip : Float
+    { tipMultiplier : Float
     , people : List Person
     }
 
@@ -30,6 +42,29 @@ type Msg
 
 
 -- Functions
+
+
+personTotal : Float -> Person -> Total
+personTotal tipMultiplier (Person _ charges) =
+    let
+        withoutTip =
+            List.sum charges
+
+        withTip =
+            withoutTip * tipMultiplier
+    in
+        Total withoutTip withTip
+
+
+totalAdd : Total -> Total -> Total
+totalAdd (Total a b) (Total c d) = Total (a+c) (b+d)
+
+
+peopleTotal : Float -> List Person -> Total
+peopleTotal tipMultiplier people =
+    List.foldl ((personTotal tipMultiplier) >> totalAdd) (Total 0 0) people
+
+
 -- Main
 
 
