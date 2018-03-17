@@ -67,9 +67,9 @@ personTotal (Person _ charges) =
     List.sum charges
 
 
-peopleTotal : List Person -> WithoutTip
-peopleTotal people =
-    List.foldl (personTotal >> (+)) 0 people
+peopleTotals : List Person -> List WithoutTip
+peopleTotals people =
+    List.map personTotal people
 
 
 
