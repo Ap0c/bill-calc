@@ -3,6 +3,36 @@ module Main exposing (..)
 import Html exposing (..)
 
 
+-- Types
+
+
+type alias Charge =
+    Float
+
+
+type alias Name =
+    String
+
+
+type Person
+    = Person Name (List Charge)
+
+
+type alias Model =
+    { tip : Float
+    , people : List Person
+    }
+
+
+type Msg
+    = Msg1
+
+
+
+-- Functions
+-- Main
+
+
 main : Program Never Model Msg
 main =
     Html.program
@@ -11,15 +41,6 @@ main =
         , update = update
         , subscriptions = subscriptions
         }
-
-
-type alias Model =
-    { tip : Float
-    }
-
-
-type Msg
-    = Msg1
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -42,4 +63,4 @@ subscriptions model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model 10.0, Cmd.none )
+    ( Model 10.0 [], Cmd.none )
