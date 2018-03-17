@@ -22,6 +22,14 @@ type alias WithTip =
     Float
 
 
+type alias TipDecimal =
+    Float
+
+
+type alias Tip =
+    Float
+
+
 type Total
     = Total WithoutTip WithTip
 
@@ -31,7 +39,7 @@ type Person
 
 
 type alias Model =
-    { tipMultiplier : Float
+    { tipDecimal : Float
     , people : List Person
     }
 
@@ -44,27 +52,28 @@ type Msg
 -- Functions
 
 
-personTotal : Float -> Person -> Total
-personTotal tipMultiplier (Person _ charges) =
-    let
-        withoutTip =
-            List.sum charges
-
-        withTip =
-            withoutTip * tipMultiplier
-    in
-        Total withoutTip withTip
+tip : TipDecimal -> WithoutTip -> Tip
+tip tipDecimal withoutTip =
+    tipDecimal * withoutTip
 
 
-totalAdd : Total -> Total -> Total
-totalAdd (Total a b) (Total c d) = Total (a+c) (b+d)
+totalWithTip : TipDecimal -> WithoutTip -> WithTip
+totalWithTip tipDecimal withoutTip =
+    withoutTip + (tip tipDecimal withoutTip)
 
 
-peopleTotal : Float -> List Person -> Total
-peopleTotal tipMultiplier people =
-    List.foldl ((personTotal tipMultiplier) >> totalAdd) (Total 0 0) people
+personTotal : Person -> WithoutTip
+personTotal (Person _ charges) =
+    List.sum charges
 
 
+peopleTotal : List Person -> WithoutTip
+peopleTotal people =
+    List.foldl (personTotal >> (+)) 0 people
+
+
+
+-- View Components
 -- Main
 
 
