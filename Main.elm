@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Html exposing (..)
+import Html.Attributes exposing (..)
 
 
 -- Types
@@ -52,14 +53,9 @@ type Msg
 -- Functions
 
 
-tip : TipDecimal -> WithoutTip -> Tip
-tip tipDecimal withoutTip =
+getTip : TipDecimal -> WithoutTip -> Tip
+getTip tipDecimal withoutTip =
     tipDecimal * withoutTip
-
-
-totalWithTip : TipDecimal -> WithoutTip -> WithTip
-totalWithTip tipDecimal withoutTip =
-    withoutTip + (tip tipDecimal withoutTip)
 
 
 personTotal : Person -> WithoutTip
@@ -74,6 +70,17 @@ peopleTotals people =
 
 
 -- View Components
+
+
+viewPrice : String -> String -> Float -> Html Msg
+viewPrice elementId labelText price =
+    div []
+        [ label [ for elementId ] [ text labelText ]
+        , output [ id elementId ] [ text (toString price) ]
+        ]
+
+
+
 -- Main
 
 
@@ -96,8 +103,23 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ text "New Html Program" ]
+    let
+        bill =
+            List.sum (peopleTotals model.people)
+
+        tip =
+            getTip model.tipDecimal bill
+
+        total =
+            bill + tip
+    in
+        main_ []
+            [ section []
+                [ viewPrice "overall-price__bill" "Bill:" bill
+                , viewPrice "overall-price__tip" "Tip:" tip
+                , viewPrice "overall-price__total" "Total:" total
+                ]
+            ]
 
 
 subscriptions : Model -> Sub Msg
