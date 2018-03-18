@@ -68,6 +68,14 @@ peopleTotals people =
     List.map personTotal people
 
 
+toTwoDp : Float -> Float
+toTwoDp =
+    (*) 100
+        >> round
+        >> toFloat
+        >> flip (/) 100
+
+
 
 -- View Components
 
@@ -76,8 +84,23 @@ viewPrice : String -> String -> Float -> Html Msg
 viewPrice elementId labelText price =
     div []
         [ label [ for elementId ] [ text labelText ]
-        , output [ id elementId ] [ text (toString price) ]
+        , output [ id elementId ] [ text (toString <| toTwoDp price) ]
         ]
+
+
+viewPerson : TipDecimal -> Person -> Html Msg
+viewPerson tipDecimal ((Person name _) as person) =
+    let
+        withoutTip =
+            personTotal person
+
+        tip =
+            getTip tipDecimal withoutTip
+
+        total =
+            withoutTip + tip
+    in
+        viewPrice ("person-" ++ name) name total
 
 
 
@@ -115,10 +138,11 @@ view model =
     in
         main_ []
             [ section []
-                [ viewPrice "overall-price__bill" "Bill:" bill
-                , viewPrice "overall-price__tip" "Tip:" tip
-                , viewPrice "overall-price__total" "Total:" total
+                [ viewPrice "overall-price-bill" "Bill:" bill
+                , viewPrice "overall-price-tip" "Tip:" tip
+                , viewPrice "overall-price-total" "Total:" total
                 ]
+            , section [] <| List.map (viewPerson model.tipDecimal) model.people
             ]
 
 
@@ -129,4 +153,4 @@ subscriptions model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model 10.0 [], Cmd.none )
+    ( Model 0.1 [ Person "Ford" [ 2.45, 6.49 ], Person "Arthur" [ 8.9 ] ], Cmd.none )
