@@ -15,15 +15,11 @@ type alias Name =
     String
 
 
-type alias WithoutTip =
-    Float
-
-
-type alias WithTip =
-    Float
-
-
 type alias TipDecimal =
+    Float
+
+
+type alias Bill =
     Float
 
 
@@ -31,8 +27,12 @@ type alias Tip =
     Float
 
 
-type Total
-    = Total WithoutTip WithTip
+type alias Total =
+    Float
+
+
+type Amounts
+    = Amounts Bill Tip Total
 
 
 type Person
@@ -53,19 +53,14 @@ type Msg
 -- Functions
 
 
-getTip : TipDecimal -> WithoutTip -> Tip
-getTip tipDecimal withoutTip =
-    tipDecimal * withoutTip
+getTip : TipDecimal -> Bill -> Tip
+getTip tipDecimal bill =
+    tipDecimal * bill
 
 
-personTotal : Person -> WithoutTip
-personTotal (Person _ charges) =
-    List.sum charges
-
-
-peopleTotals : List Person -> List WithoutTip
-peopleTotals people =
-    List.map personTotal people
+chargesPerPerson : List Person -> List Charge
+chargesPerPerson =
+    List.map (\(Person _ charges) -> List.sum charges)
 
 
 toTwoDp : Float -> Float
@@ -74,6 +69,21 @@ toTwoDp =
         >> round
         >> toFloat
         >> flip (/) 100
+
+
+getAmounts : TipDecimal -> List Charge -> Amounts
+getAmounts tipDecimal charges =
+    let
+        bill =
+            List.sum charges
+
+        tip =
+            getTip tipDecimal bill
+
+        total =
+            bill + tip
+    in
+        Amounts bill tip total
 
 
 
@@ -89,16 +99,9 @@ viewAmount elementId labelText amount =
 
 
 viewPerson : TipDecimal -> Person -> Html Msg
-viewPerson tipDecimal ((Person name _) as person) =
+viewPerson tipDecimal (Person name charges) =
     let
-        withoutTip =
-            personTotal person
-
-        tip =
-            getTip tipDecimal withoutTip
-
-        total =
-            withoutTip + tip
+        (Amounts _ _ total) = getAmounts tipDecimal charges
     in
         viewAmount ("person-" ++ name) name total
 
@@ -127,14 +130,7 @@ update msg model =
 view : Model -> Html Msg
 view model =
     let
-        bill =
-            List.sum (peopleTotals model.people)
-
-        tip =
-            getTip model.tipDecimal bill
-
-        total =
-            bill + tip
+        (Amounts bill tip total) = getAmounts model.tipDecimal <| chargesPerPerson model.people
     in
         main_ []
             [ section []
