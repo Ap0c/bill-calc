@@ -1,7 +1,7 @@
 {
     "version": "1.0.0",
     "summary": "An easy way to calculate restaurant bills",
-    "repository": "https://github.com/user/project.git",
+    "repository": "https://github.com/Ap0c/bill-calc.git",
     "license": "BSD3",
     "source-directories": [
         "."
