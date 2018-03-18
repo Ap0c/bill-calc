@@ -80,11 +80,11 @@ toTwoDp =
 -- View Components
 
 
-viewPrice : String -> String -> Float -> Html Msg
-viewPrice elementId labelText price =
+viewAmount : String -> String -> Float -> Html Msg
+viewAmount elementId labelText amount =
     div []
         [ label [ for elementId ] [ text labelText ]
-        , output [ id elementId ] [ text (toString <| toTwoDp price) ]
+        , output [ id elementId ] [ text (toString <| toTwoDp amount) ]
         ]
 
 
@@ -100,7 +100,7 @@ viewPerson tipDecimal ((Person name _) as person) =
         total =
             withoutTip + tip
     in
-        viewPrice ("person-" ++ name) name total
+        viewAmount ("person-" ++ name) name total
 
 
 
@@ -138,9 +138,9 @@ view model =
     in
         main_ []
             [ section []
-                [ viewPrice "overall-price-bill" "Bill:" bill
-                , viewPrice "overall-price-tip" "Tip:" tip
-                , viewPrice "overall-price-total" "Total:" total
+                [ viewAmount "overall-price-bill" "Bill:" bill
+                , viewAmount "overall-price-tip" "Tip:" tip
+                , viewAmount "overall-price-total" "Total:" total
                 ]
             , section [] <| List.map (viewPerson model.tipDecimal) model.people
             ]
